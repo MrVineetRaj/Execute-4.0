@@ -3,7 +3,7 @@
 import { ITransaction } from "@/models/transaction"
 import { useEffect, useState } from "react"
 import { Cell, Legend, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts"
-interface IncomeExpenseData
+
 
 export function ExpenseBreakdown() {
   const [data, setData] = useState<ITransaction[]>([])

@@ -73,14 +73,28 @@ export async function POST(req: Request) {
     // Connect to database
     await connectToDatabase();
 
+    // Fetch all transactions for this user and category
+    const userTransactions = await Transaction.find({ userId, category });
+
+    // Calculate total spent
+    const totalSpent = userTransactions.reduce((sum, t) => sum + Math.abs(t.amount), 0);
+
+    // Define category budgets (modify as needed)
+    let budgets = { food: 5000, travel: 3000, shopping: 8000 };
+
+    // Check budget limit
+    if (totalSpent + Math.abs(Number(amount)) > (budgets[category] || 0)) {
+      return NextResponse.json(
+        { message: `⚠️ Warning! Budget for ${category} exceeded!` },
+        { status: 400 }
+      );
+    }
+
     // Create transaction
     const transaction = new Transaction({
       userId,
       type,
-      amount:
-        type === "expense"
-          ? -Math.abs(Number(amount))
-          : Math.abs(Number(amount)),
+      amount: type === "expense" ? -Math.abs(Number(amount)) : Math.abs(Number(amount)),
       category,
       date: new Date(date),
       description,
